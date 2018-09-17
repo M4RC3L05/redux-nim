@@ -2,15 +2,12 @@ import redux_nim/arrUtils
 
 type ReduxSubscription = proc(): void
 type ReduxUnsubscription = proc(): void
-type ReduxAction*[T] = object
-    action*: string
-    payload*: T
-
-type ReduxReducer*[T] = proc(state: T, action: ReduxAction[T]): T
+type ReduxAction* = ref object of RootObj
+type ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
 
 type ReduxStore*[T] = ref object
     state*: T
-    reducer*: proc(state: T, action: ReduxAction[T]): T
+    reducer*: proc(state: T, action: ReduxAction): T
     subscriptions*: seq[proc(): void]
 
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
@@ -18,7 +15,7 @@ proc getState*[T](store: ReduxStore[T]): T
 proc subscribe*[T](store: ReduxStore[T], fn: ReduxSubscription): ReduxUnsubscription
 proc unsubscribe*[T](store: ReduxStore[T], id: int): void
 proc notify[T](store: ReduxStore[T]): void
-proc dispatch*[T](store: ReduxStore[T], action: ReduxAction[T]): void
+proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): void
 
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T] =
     result = ReduxStore[T](reducer: reducer, state: initialState)
@@ -33,7 +30,7 @@ proc subscribe*[T](store: ReduxStore[T], fn: ReduxSubscription): ReduxUnsubscrip
 proc unsubscribe*[T](store: ReduxStore[T], id: int): void =
     store.subscriptions.delete(id)
 
-proc dispatch*[T](store: ReduxStore[T], action: ReduxAction[T]): void =
+proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): void =
     store.state = store.reducer(store.state, action)
     store.notify()
 

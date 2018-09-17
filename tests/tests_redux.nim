@@ -8,15 +8,20 @@ suite "Redux Tests":
         type User = object
             name: string
 
+        type
+            ChangeUserNameAction = ref object of ReduxAction
+                payload: string
+
         let model = User(name: "João")
 
-        let userReducer: ReduxReducer[User] = proc(state: User = model, action: ReduxAction[User]): User =
-            case action.action:
-                of "CHNAGE_NAME":
-                    return User(name: action.payload.name)
+        let userReducer: ReduxReducer[User] = proc(state: User = model, action: ReduxAction): User =
+            if action of ChangeUserNameAction:
+                return User(name: ChangeUserNameAction(action).payload)
 
-                else:
-                    return state
+            else:
+                return state
+
+
 
         let store = newReduxStore[User](userReducer, model)
 
@@ -27,7 +32,7 @@ suite "Redux Tests":
     test "It should notify when new actions is dispatched":
 
 
-        let changeUserNameAction = ReduxAction[User](action: "CHNAGE_NAME", payload: User(name:"Ana"))
+        let changeUserNameAction = ChangeUserNameAction(payload: "Ana")
 
         let sub = store.subscribe do () -> void:
             check(store.getState().name == "Ana")
@@ -38,7 +43,7 @@ suite "Redux Tests":
     test "it Should unsubscribe from subscription":
         var tmp = ""
 
-        let changeUserNameAction = ReduxAction[User](action: "CHNAGE_NAME", payload: User(name:"Ana"))
+        let changeUserNameAction = ChangeUserNameAction(payload: "Ana")
 
         let sub = store.subscribe do () -> void:
             tmp.add(store.getState().name)

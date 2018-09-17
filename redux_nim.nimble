@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "0.1.1"
 author        = "M4RC3L0"
 description   = "Redux Implementation in nim"
 license       = "MIT"
