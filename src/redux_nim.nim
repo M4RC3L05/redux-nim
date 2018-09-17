@@ -8,7 +8,7 @@ type ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
 type ReduxStore*[T] = ref object
     state*: T
     reducer*: proc(state: T, action: ReduxAction): T
-    subscriptions*: seq[proc(): void]
+    subscriptions*: seq[ReduxSubscription]
 
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
 proc getState*[T](store: ReduxStore[T]): T
