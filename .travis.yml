@@ -39,9 +39,6 @@ install:
 before_script:
     - export PATH="nim-$BRANCH/bin${PATH:+:$PATH}"
 script:
-    # Replace uppercase strings!
-    - nimble build
-    # Optional: build docs.
     - nimble test
 cache:
     directories:
