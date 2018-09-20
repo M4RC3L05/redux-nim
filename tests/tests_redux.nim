@@ -6,7 +6,7 @@ import redux_nim
 suite "Redux Tests":
 
     setup:
-        type User = ref object of RootObj
+        type User = ref object
             name: string
 
         type
@@ -20,9 +20,7 @@ suite "Redux Tests":
             if action of ChangeUserNameAction:
                 return User(name: ChangeUserNameAction(action).payload)
 
-            else:
-
-                return if state != nil: state else: initState
+            return if state != nil: state else: initState
 
         let store = newReduxStore[User](userReducer)
 

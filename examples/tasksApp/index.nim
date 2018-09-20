@@ -1,5 +1,5 @@
-import redux_nim
-import redux_nim/arrUtils
+import ./../../src/redux_nim
+import ./../../src/redux_nim/arrUtils
 import strformat
 import ./models/Task
 import parseutils
@@ -27,6 +27,8 @@ type
 
 # CREATE THE REDUCER, THAT IS RESPONSIBLE FOR RETURN THE
 # UPDATED STATE, GIVEN THE ACTION
+let initState = AppState(tasks: @[])
+
 let tasksReducer: ReduxReducer[AppState] = proc (state: AppState, action: ReduxAction): AppState =
 
     if action of AddTaskAction:
@@ -46,10 +48,10 @@ let tasksReducer: ReduxReducer[AppState] = proc (state: AppState, action: ReduxA
 
         return AppState(tasks: tasks)
 
-    return state
+    return if state != nil: state else: initState
 
 # CREATE THE STORE
-let store = newReduxStore[AppState](tasksReducer, AppState(tasks: @[]));
+let store = newReduxStore[AppState](tasksReducer);
 
 # PROCEDURE TO PRINT ALL TASKS IN STATE
 proc printTasks(tasks: seq[Task]) =
