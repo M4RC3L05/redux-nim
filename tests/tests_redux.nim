@@ -9,8 +9,6 @@ suite "Redux Tests":
         type User = ref object of RootObj
             name: string
 
-        proc `$`(user: User): string = &"User: {user.name}"
-
         type
             ChangeUserNameAction = ref object of ReduxAction
                 payload: string
