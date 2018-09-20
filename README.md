@@ -13,3 +13,7 @@ $ nimble install redux-nim
 ## How to use
 
 Jus install the package and read the apps in the examples folder.
+
+### Others
+
+This package is only tested against the devel branch of nim
