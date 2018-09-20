@@ -5,10 +5,15 @@ import ./models/Task
 import parseutils
 import sequtils
 
+
+# SOME TYPES FOR THIS APP
 type
+    # STATE TYPE
     AppState = ref object
         tasks: seq[Task]
 
+    # ACTIONS TYPES THAT WILL BE DISPATCHES TO THE REDUCER
+    # SO THAT THE STATE IS UPDATE
     AddTaskAction = ref object of ReduxAction
         payload: Task
 
@@ -17,9 +22,11 @@ type
 
     UpdateTaskAction = ref object of ReduxAction
         payload: tuple[prevTask: Task, newTaskText: string]
+    # END OF ACTION TYPES
 
 
-
+# CREATE THE REDUCER, THAT IS RESPONSIBLE FOR RETURN THE
+# UPDATED STATE, GIVEN THE ACTION
 let tasksReducer: ReduxReducer[AppState] = proc (state: AppState, action: ReduxAction): AppState =
 
     if action of AddTaskAction:
@@ -41,14 +48,17 @@ let tasksReducer: ReduxReducer[AppState] = proc (state: AppState, action: ReduxA
 
     return state
 
-
+# CREATE THE STORE
 let store = newReduxStore[AppState](tasksReducer, AppState(tasks: @[]));
 
+# PROCEDURE TO PRINT ALL TASKS IN STATE
 proc printTasks(tasks: seq[Task]) =
     echo("Tasks:")
     tasks.forEach do (t: Task, k: int) -> void: echo(&"Task#{k}: {t.text}")
     echo("")
 
+
+# PROCEDURE TO CREATE AND DISPATCH THE CREATED TASK
 proc newTask() =
     var task = Task()
 
@@ -59,6 +69,7 @@ proc newTask() =
     store.dispatch(AddTaskAction(payload: task))
     echo("saved")
 
+# PROCEDURE TO PRINT THE APPLICATION MENU
 proc printMenu() =
     echo("1 - Add task")
     echo("2 - Remove Task")
@@ -67,6 +78,7 @@ proc printMenu() =
     echo("0 - Exit")
     echo("")
 
+# PROCEDURE TO REMOVE AND DISPATCH A GIVEN TASK
 proc removeTask() =
     var op: int
 
@@ -82,6 +94,7 @@ proc removeTask() =
     store.dispatch(RemoveTaskAction(payload: op))
     echo("removed")
 
+# PROCEDURE TO UPDATE AND DISPATCH A GIVEN TASK
 proc updateTask() =
     var op: int
 
@@ -108,12 +121,15 @@ proc updateTask() =
 
     echo("updated")
 
+# SUBESCRIPTION TO THE STORE SO THAT WE CAN BE NOTIFIED
+# WHEN UPDATES OCURR TO THE STORE
 let sub = store.subscribe do () -> void:
     echo("From sub:")
     printTasks(store.getState().tasks)
 
 var op = ""
 
+# MAIN LOOP OF THE APLICATION
 while true:
     printMenu()
     stdout.write("Opção: ")
