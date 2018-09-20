@@ -1,15 +1,18 @@
 import redux_nim/arrUtils
+import strformat
 
 type ReduxSubscription = proc(): void
 type ReduxUnsubscription = proc(): void
 type ReduxAction* = ref object of RootObj
 type ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
 
+type INITReduxAction = ref object of ReduxAction
 type ReduxStore*[T] = ref object
     state*: T
     reducer*: proc(state: T, action: ReduxAction): T
     subscriptions*: seq[ReduxSubscription]
 
+proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
 proc getState*[T](store: ReduxStore[T]): T
 proc subscribe*[T](store: ReduxStore[T], fn: ReduxSubscription): ReduxUnsubscription
@@ -17,8 +20,13 @@ proc unsubscribe*[T](store: ReduxStore[T], id: int): void
 proc notify[T](store: ReduxStore[T]): void
 proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): void
 
+proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T] =
+    result = ReduxStore[T](reducer: reducer)
+    result.dispatch(INITReduxAction())
+
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T] =
     result = ReduxStore[T](reducer: reducer, state: initialState)
+    result.dispatch(INITReduxAction())
 
 proc getState*[T](store: ReduxStore[T]): T = store.state
 

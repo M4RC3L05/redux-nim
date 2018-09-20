@@ -1,33 +1,36 @@
 import unittest
+import strformat
 
 import redux_nim
 
 suite "Redux Tests":
 
     setup:
-        type User = object
+        type User = ref object of RootObj
             name: string
+
+        proc `$`(user: User): string = &"User: {user.name}"
 
         type
             ChangeUserNameAction = ref object of ReduxAction
                 payload: string
 
-        let model = User(name: "João")
+        let initState = User(name: "João")
 
-        let userReducer: ReduxReducer[User] = proc(state: User = model, action: ReduxAction): User =
+        let userReducer: ReduxReducer[User] = proc(state: User = initState, action: ReduxAction): User =
+            let innerState = if state == nil: initState else: state
+
             if action of ChangeUserNameAction:
                 return User(name: ChangeUserNameAction(action).payload)
 
             else:
-                return state
+                return innerState
 
-
-
-        let store = newReduxStore[User](userReducer, model)
+        let store = newReduxStore[User](userReducer)
 
     test "It should create a new Redux Store":
-
-        check(store.getState() == model)
+        let store1 = newReduxStore[User](userReducer)
+        check(store1.getState() == initState)
 
     test "It should notify when new actions is dispatched":
 
