@@ -18,13 +18,13 @@ suite "Redux Tests":
         let initState = User(name: "João")
 
         let userReducer: ReduxReducer[User] = proc(state: User = initState, action: ReduxAction): User =
-            let innerState = if state == nil: initState else: state
 
             if action of ChangeUserNameAction:
                 return User(name: ChangeUserNameAction(action).payload)
 
             else:
-                return innerState
+
+                return if state != nil: state else: initState
 
         let store = newReduxStore[User](userReducer)
 
@@ -49,11 +49,16 @@ suite "Redux Tests":
         let changeUserNameAction = ChangeUserNameAction(payload: "Ana")
 
         let sub = store.subscribe do () -> void:
-            tmp.add(store.getState().name)
+            tmp.add("s1" & store.getState().name)
 
+        let sub2 = store.subscribe do () -> void:
+            tmp.add("s2" & store.getState().name)
+
+        store.dispatch(changeUserNameAction)
+        sub2()
         store.dispatch(changeUserNameAction)
         sub()
         store.dispatch(changeUserNameAction)
 
-        check(tmp == "Ana")
+        check(tmp == "s1Anas2Anas1Ana")
 

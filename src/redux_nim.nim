@@ -1,5 +1,4 @@
 import redux_nim/arrUtils
-import strformat
 
 type ReduxSubscription = proc(): void
 type ReduxUnsubscription = proc(): void
@@ -9,7 +8,7 @@ type ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
 type INITReduxAction = ref object of ReduxAction
 type ReduxStore*[T] = ref object
     state*: T
-    reducer*: proc(state: T, action: ReduxAction): T
+    reducer*: ReduxReducer[T]
     subscriptions*: seq[ReduxSubscription]
 
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T]
@@ -39,7 +38,7 @@ proc unsubscribe*[T](store: ReduxStore[T], id: int): void =
     store.subscriptions.delete(id)
 
 proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): void =
-    store.state = store.reducer(store.state, action)
+    store.state = store.reducer(state = store.state, action = action)
     store.notify()
 
 proc notify[T](store: ReduxStore[T]): void =
