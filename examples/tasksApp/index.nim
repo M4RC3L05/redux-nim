@@ -18,7 +18,7 @@ type
         payload: Task
 
     RemoveTaskAction = ref object of ReduxAction
-        payload: int
+        payload: Task
 
     UpdateTaskAction = ref object of ReduxAction
         payload: tuple[prevTask: Task, newTaskText: string]
@@ -32,12 +32,13 @@ let initState = AppState(tasks: @[])
 let tasksReducer: ReduxReducer[AppState] = proc (state: AppState, action: ReduxAction): AppState =
 
     if action of AddTaskAction:
-        state.tasks.add(AddTaskAction(action).payload)
-        return AppState(tasks: state.tasks)
+        var tasks = state.tasks.cycle(1)
+        tasks.add(AddTaskAction(action).payload)
+        return AppState(tasks: tasks)
 
     if action of RemoveTaskAction:
-        state.tasks.delete(RemoveTaskAction(action).payload)
-        return AppState(tasks: state.tasks)
+        let newTasks = state.tasks.filter do (t: Task) -> bool : t.text == RemoveTaskAction(action).payload.text
+        return AppState(tasks: newTasks)
 
     if action of UpdateTaskAction:
         let tasks = state.tasks.map do (t: Task) -> Task:
@@ -93,7 +94,7 @@ proc removeTask() =
         echo("Opção invalida")
         return
 
-    store.dispatch(RemoveTaskAction(payload: op))
+    store.dispatch(RemoveTaskAction(payload: store.getState().tasks[op]))
     echo("removed")
 
 # PROCEDURE TO UPDATE AND DISPATCH A GIVEN TASK
