@@ -1,15 +1,22 @@
 import redux_nim/arrUtils
 import sequtils, strformat
-type ReduxSubscription = proc(): void
-type ReduxUnsubscription = proc(): void
-type ReduxAction* = ref object of RootObj
-type ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
 
-type INITReduxAction = ref object of ReduxAction
-type ReduxStore*[T] = ref object
-    state*: T
-    reducer*: ReduxReducer[T]
-    subscriptions*: seq[ReduxSubscription]
+type
+    ReduxSubscription = proc(): void
+
+    ReduxUnsubscription = proc(): void
+
+    ReduxAction* = ref object of RootObj
+
+    ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
+
+    INITReduxAction = ref object of ReduxAction
+
+
+    ReduxStore*[T] = ref object
+        state*: T
+        reducer*: ReduxReducer[T]
+        subscriptions*: seq[ReduxSubscription]
 
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
