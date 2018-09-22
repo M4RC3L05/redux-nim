@@ -12,7 +12,6 @@ type
 
     INITReduxAction = ref object of ReduxAction
 
-
     ReduxStore*[T] = ref object
         state*: T
         reducer*: ReduxReducer[T]
