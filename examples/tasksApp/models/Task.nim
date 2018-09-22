@@ -1,3 +1,3 @@
 type
-    Task* = ref object
+    Task* = object
         text*: string
