@@ -37,7 +37,7 @@ let tasksReducer: ReduxReducer[AppState] = proc (state: AppState, action: ReduxA
         return AppState(tasks: tasks)
 
     if action of RemoveTaskAction:
-        let newTasks = state.tasks.filter do (t: Task) -> bool : t.text == RemoveTaskAction(action).payload.text
+        let newTasks = state.tasks.filter do (t: Task) -> bool : t.text != RemoveTaskAction(action).payload.text
         return AppState(tasks: newTasks)
 
     if action of UpdateTaskAction:
