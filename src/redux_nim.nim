@@ -11,8 +11,6 @@ type
 
     ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
 
-    # ReduxMiddleware* = proc[T](store: ReduxStore[T]): proc(action: ReduxAction): proc(next: proc[T](store: ReduxStore[T], action: ReduxAction): void): ReduxAction
-
     INITReduxAction = ref object of ReduxAction
 
     ReduxStore*[T] = ref object
@@ -66,7 +64,6 @@ proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction =
         return action
     else:
         let actionCompose = compose(store.middlewares)(action)
-        # store.notify()
         return actionCompose
 
 proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): void =
@@ -75,27 +72,3 @@ proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): void =
 
 proc notify[T](store: ReduxStore[T]): void =
     store.subscriptions.forEach do (v: proc(): void, k: int) -> void: v()
-
-
-
-
-# type
-#     PlusReduxAction = ref object of ReduxAction
-#         payload: int
-
-# let reducer: ReduxReducer[int] = proc(state: int = 0, action: ReduxAction): int =
-
-#     if action of PlusReduxAction:
-#         return state + PlusReduxAction(action).payload
-
-#     return state
-
-# let store = newReduxStore[int](reducer, 0, @[loggerMiddleware])
-
-# let sub = store.subscribe do () -> void:
-#     echo("STATE: ", store.getState())
-
-
-# discard store.dispatch(PlusReduxAction(payload: 1))
-# discard store.dispatch(PlusReduxAction(payload: 3))
-# discard store.dispatch(PlusReduxAction(payload: 8))
