@@ -1,4 +1,6 @@
 proc compose*[T](fns: openArray[proc (x: T): T]): proc(arg: T): T =
+    ## Compose a iterable of closures to a single closure of a given type
+
     proc inner(fnsSeq: seq[proc (x: T): T]): proc(arg: T): T =
         return proc(arg: T): T =
             proc rec(curr: T, arr: seq[proc (x: T): T], i: int): T =
