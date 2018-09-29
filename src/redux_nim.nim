@@ -45,7 +45,7 @@ proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
 
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T, middlewares: seq[ReduxMiddleware[T]]): ReduxStore[T] =
     var localStore = ReduxStore[T](reducer: reducer, state: initialState)
-    let goodStateMiddles = map(middlewares, proc(m: proc(store: ReduxStore[int]): proc(next: proc(store: ReduxStore[int], action: ReduxAction): void): proc(action: ReduxAction): ReduxAction): proc(action: ReduxAction): ReduxAction = m(localStore)(innerDispatch))
+    let goodStateMiddles = map(middlewares, proc(m: ReduxMiddleware[T]): proc(action: ReduxAction): ReduxAction = m(localStore)(innerDispatch))
     localStore.middlewares = goodStateMiddles
     discard localStore.dispatch(INITReduxAction())
     return localStore
@@ -77,31 +77,25 @@ proc notify[T](store: ReduxStore[T]): void =
     store.subscriptions.forEach do (v: proc(): void, k: int) -> void: v()
 
 
-let loggerMiddleware: ReduxMiddleware[int] = proc(store: ReduxStore[int]): proc(next: proc(store: ReduxStore[int], action: ReduxAction): void): proc(action: ReduxAction): ReduxAction =
-    return proc(next: proc(store: ReduxStore[int], action: ReduxAction): void): proc(action: ReduxAction): ReduxAction =
-        return proc(action: ReduxAction): ReduxAction =
-            echo("Before: ", store.getState())
-            next(store, action)
-            echo("After: ", store.getState())
-            return action
-
-type
-    PlusReduxAction = ref object of ReduxAction
-        payload: int
-
-let reducer: ReduxReducer[int] = proc(state: int = 0, action: ReduxAction): int =
-
-    if action of PlusReduxAction:
-        return state + PlusReduxAction(action).payload
-
-    return state
-
-let store = newReduxStore[int](reducer, 0, @[loggerMiddleware])
-
-let sub = store.subscribe do () -> void:
-    echo("STATE: ", store.getState())
 
 
-discard store.dispatch(PlusReduxAction(payload: 1))
-discard store.dispatch(PlusReduxAction(payload: 3))
-discard store.dispatch(PlusReduxAction(payload: 8))
+# type
+#     PlusReduxAction = ref object of ReduxAction
+#         payload: int
+
+# let reducer: ReduxReducer[int] = proc(state: int = 0, action: ReduxAction): int =
+
+#     if action of PlusReduxAction:
+#         return state + PlusReduxAction(action).payload
+
+#     return state
+
+# let store = newReduxStore[int](reducer, 0, @[loggerMiddleware])
+
+# let sub = store.subscribe do () -> void:
+#     echo("STATE: ", store.getState())
+
+
+# discard store.dispatch(PlusReduxAction(payload: 1))
+# discard store.dispatch(PlusReduxAction(payload: 3))
+# discard store.dispatch(PlusReduxAction(payload: 8))
