@@ -32,5 +32,3 @@ deploy: off
 
 test_script:
     - ./tests/CHANGEME
-
-deploy: off
