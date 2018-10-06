@@ -25,10 +25,7 @@ install:
     - 7z x -y "%NIM_ARCHIVE%" -o"%CD%\tools_tmp"> nul
     - SET PATH=%CD%\tools_tmp\%NIM_DIR%\bin;%CD%\tools_tmp\%MINGW_DIR%\bin;%PATH%
 
-build_script:
-    - nimble.exe test
-
 test_script:
-    - ./tests/CHANGEME
+    - nimble.exe test
 
 deploy: off
