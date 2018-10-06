@@ -1,3 +1,5 @@
+image: Visual Studio 2017
+
 version: '{build}'
 
 cache:
@@ -25,7 +27,10 @@ install:
     - 7z x -y "%NIM_ARCHIVE%" -o"%CD%\tools_tmp"> nul
     - SET PATH=%CD%\tools_tmp\%NIM_DIR%\bin;%CD%\tools_tmp\%MINGW_DIR%\bin;%PATH%
 
+build: off
+deploy: off
+
 test_script:
-    - nimble.exe test
+    - ./tests/CHANGEME
 
 deploy: off
