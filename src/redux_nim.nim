@@ -72,7 +72,7 @@ proc unsubscribe*[T](store: ReduxStore[T], id: int): void =
     ## Unsubscribes from the store
 
     store.subscriptions.delete(id)
-
+    
 proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction =
     ## Dispatches an action to the reducer, so that the reducer
     ## produces the new state
