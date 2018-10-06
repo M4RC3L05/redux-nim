@@ -31,4 +31,4 @@ build: off
 deploy: off
 
 test_script:
-    - ./tests/CHANGEME
+    - nimble.exe test
