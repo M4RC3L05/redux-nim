@@ -1260,11 +1260,14 @@ function main() {
   state: T
   reducer: ReduxReducer[T]
   subscriptions: seq[ReduxSubscription]
-  middlewares: seq[proc (action: ReduxAction): ReduxAction]"><wbr />Redux<wbr />Store<span class="attachedType" style="visibility:hidden"></span></a></li>
+  middlewares: seq[proc (action: ReduxAction): ReduxAction]
+  isDispatching: bool"><wbr />Redux<wbr />Store<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#ReduxMiddleware"
     title="ReduxMiddleware[T] = proc (store: ReduxStore[T]): proc (
     next: proc (store: ReduxStore[T]; action: ReduxAction): void): proc (
     action: ReduxAction): ReduxAction"><wbr />Redux<wbr />Middleware<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#InDispatchingProcessError"
+    title="InDispatchingProcessError = object of Exception"><wbr />In<wbr />Dispatching<wbr />Process<wbr />Error<span class="attachedType" style="visibility:hidden"></span></a></li>
 
   </ul>
 </li>
@@ -1334,6 +1337,7 @@ function main() {
   <span class="Identifier">reducer</span><span class="Other">:</span> <a href="redux_nim.html#ReduxReducer"><span class="Identifier">ReduxReducer</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span>
   <span class="Identifier">subscriptions</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><a href="redux_nim.html#ReduxSubscription"><span class="Identifier">ReduxSubscription</span></a><span class="Other">]</span>
   <span class="Identifier">middlewares</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">]</span>
+  <span class="Identifier">isDispatching</span><span class="Other">:</span> <span class="Identifier">bool</span>
 </pre></dt>
 <dd>
 
@@ -1343,6 +1347,12 @@ function main() {
 <dt><pre><a href="redux_nim.html#ReduxMiddleware"><span class="Identifier">ReduxMiddleware</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span> <span class="Other">=</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span>
     <span class="Identifier">next</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">void</span><span class="Other">)</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span>
     <span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a></pre></dt>
+<dd>
+
+
+</dd>
+<a id="InDispatchingProcessError"></a>
+<dt><pre><a href="redux_nim.html#InDispatchingProcessError"><span class="Identifier">InDispatchingProcessError</span></a> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">Exception</span></pre></dt>
 <dd>
 
 
@@ -1372,7 +1382,7 @@ Creates a new redux store of a given type
 
 </dd>
 <a id="getState%2CReduxStore%5BT%5D"></a>
-<dt><pre><span class="Keyword">proc</span> <span class="Identifier">getState</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
+<dt><pre><span class="Keyword">proc</span> <span class="Identifier">getState</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><a href="redux_nim.html#InDispatchingProcessError"><span class="Identifier">InDispatchingProcessError</span></a><span class="Other">]</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
 Returns the state of the store
 
@@ -1405,7 +1415,7 @@ Dispatches an action to the reducer, so that the reducer produces the new state
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2018-10-06 00:29:10 UTC</small>
+        <small>Made with Nim. Generated: 2018-10-07 14:27:33 UTC</small>
       </div>
     </div>
   </div>

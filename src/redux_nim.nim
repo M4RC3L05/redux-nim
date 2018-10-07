@@ -18,13 +18,16 @@ type
         reducer: ReduxReducer[T]
         subscriptions: seq[ReduxSubscription]
         middlewares: seq[proc(action: ReduxAction): ReduxAction]
+        isDispatching: bool
 
     ReduxMiddleware*[T] = proc(store: ReduxStore[T]): proc(next: proc(store: ReduxStore[T], action: ReduxAction): void): proc(action: ReduxAction): ReduxAction
+
+    InDispatchingProcessError* = object of Exception
 
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T, middlewares: seq[ReduxMiddleware[T]]): ReduxStore[T]
-proc getState*[T](store: ReduxStore[T]): T
+proc getState*[T](store: ReduxStore[T]): T {.raises: [InDispatchingProcessError].}
 proc subscribe*[T](store: ReduxStore[T], fn: ReduxSubscription): ReduxUnsubscription
 proc unsubscribe*[T](store: ReduxStore[T], id: int): void
 proc notify[T](store: ReduxStore[T]): void
@@ -34,28 +37,31 @@ proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): void
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T] =
     ## Creates a new redux store of a given type
 
-    var localStore = ReduxStore[T](reducer: reducer)
+    var localStore = ReduxStore[T](reducer: reducer, isDispatching: false)
     discard localStore.dispatch(INITReduxAction())
     return localStore
 
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T] =
     ## Creates a new redux store of a given type
 
-    var localStore = ReduxStore[T](reducer: reducer, state: initialState)
+    var localStore = ReduxStore[T](reducer: reducer, state: initialState, isDispatching: false)
     discard localStore.dispatch(INITReduxAction())
     return localStore
 
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T, middlewares: seq[ReduxMiddleware[T]]): ReduxStore[T] =
     ## Creates a new redux store of a given type
 
-    var localStore = ReduxStore[T](reducer: reducer, state: initialState)
+    var localStore = ReduxStore[T](reducer: reducer, state: initialState, isDispatching: false)
     let goodStateMiddles = map(middlewares, proc(m: ReduxMiddleware[T]): proc(action: ReduxAction): ReduxAction = m(localStore)(innerDispatch))
     localStore.middlewares = goodStateMiddles
     discard localStore.dispatch(INITReduxAction())
     return localStore
 
-proc getState*[T](store: ReduxStore[T]): T =
+proc getState*[T](store: ReduxStore[T]): T {.raises: [InDispatchingProcessError].} =
     ## Returns the state of the store
+
+    if store.isDispatching:
+        raise newException(InDispatchingProcessError, "You cannot get state while the dispatch is in progress!")
 
     return store.state
 
@@ -72,7 +78,7 @@ proc unsubscribe*[T](store: ReduxStore[T], id: int): void =
     ## Unsubscribes from the store
 
     store.subscriptions.delete(id)
-    
+
 proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction =
     ## Dispatches an action to the reducer, so that the reducer
     ## produces the new state
@@ -85,7 +91,9 @@ proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction =
         return actionCompose
 
 proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): void =
+    store.isDispatching = true
     store.state = store.reducer(state = store.state, action = action)
+    store.isDispatching = false
     store.notify()
 
 proc notify[T](store: ReduxStore[T]): void =

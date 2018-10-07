@@ -17,12 +17,21 @@ suite "Redux Tests":
             ChangeUserNameAction = ref object of ReduxAction
                 payload: string
 
+        type
+            ChangeUserNameProcAction = ref object of ReduxAction
+                payload: proc(): string
+
         let initState = User(name: "João")
 
         let userReducer: ReduxReducer[User] = proc(state: User = initState, action: ReduxAction): User =
 
             if action of ChangeUserNameAction:
                 return User(name: ChangeUserNameAction(action).payload)
+
+            if action of ChangeUserNameProcAction:
+                return User(
+                    name: ChangeUserNameProcAction(action).payload()
+                )
 
             return if state != nil: state else: initState
 
@@ -77,6 +86,24 @@ suite "Redux Tests":
 
 
         let store2 = newReduxStore[User](userReducer, initState, @[loggerMiddleware])
-        discard store2.dispatch(ChangeUserNameAction(payload: "Ana"))
+        discard store2.dispatch(
+            ChangeUserNameAction(
+                payload: "Ana"
+            )
+        )
 
         check(tmp == "Before: User: JoãoAfter: User: JoãoBefore: User: JoãoAfter: User: Ana")
+
+    test "it should throw exception if getting state while dispatching":
+
+        let store2 = newReduxStore[User](userReducer, initState)
+
+        discard store2.dispatch(
+            ChangeUserNameProcAction(
+                payload: proc(): string =
+                    expect(InDispatchingProcessError):
+                        discard store2.getState()
+                    return "Ana"
+            )
+        )
+
