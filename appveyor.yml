@@ -3,6 +3,8 @@ version: '{build}'
 cache:
     - x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
     - i686-4.9.2-release-win32-dwarf-rt_v4-rev4.7z
+    - nim-0.19.0_x64.zip
+    - nim-0.19.0_x32.zip
 
 matrix:
     fast_finish: false
@@ -12,27 +14,26 @@ environment:
         - MINGW_DIR: mingw64
           MINGW_URL: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z/download
           MINGW_ARCHIVE: x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
+          NIM_ARCHIVE: nim-0.19.0_x64.zip
+          NIM_DIR: nim-0.19.0
+          NIM_URL: https://nim-lang.org/download/nim-0.19.0_x64.zip
           platform: x64
 
         - MINGW_DIR: mingw32
           MINGW_URL: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.9.2/threads-win32/dwarf/i686-4.9.2-release-win32-dwarf-rt_v4-rev4.7z/download
           MINGW_ARCHIVE: i686-4.9.2-release-win32-dwarf-rt_v4-rev4.7z
+          NIM_ARCHIVE: nim-0.19.0_x32zip
+          NIM_DIR: nim-0.19.0
+          NIM_URL: https://nim-lang.org/download/nim-0.19.0_x32.zip
           platform: x86
 
 install:
-    - MKDIR %CD%\DIST
-    - MKDIR %CD%\DIST\PCRE
+    - MKDIR %CD%\tools_tmp
     - IF not exist "%MINGW_ARCHIVE%" appveyor DownloadFile "%MINGW_URL%" -FileName "%MINGW_ARCHIVE%"
-    - 7z x -y "%MINGW_ARCHIVE%" -o"%CD%\DIST"> nul
-    - SET PATH=%CD%\DIST\%MINGW_DIR%\BIN;%CD%\BIN;%PATH%
-    - IF "%PLATFORM%" == "x64" ( copy C:\OpenSSL-Win64\libeay32.dll %CD%\BIN\libeay64.dll & copy C:\OpenSSL-Win64\libeay32.dll %CD%\BIN\libeay32.dll & copy C:\OpenSSL-Win64\libssl32.dll %CD%\BIN\libssl64.dll & copy C:\OpenSSL-Win64\libssl32.dll %CD%\BIN\libssl32.dll )
-      ELSE ( copy C:\OpenSSL-Win32\libeay32.dll %CD%\BIN\libeay32.dll & copy C:\OpenSSL-Win32\libssl32.dll %CD%\BIN\libssl32.dll )
-    - IF "%PLATFORM%" == "x64" ( copy %CD%\DIST\sqlite3.dll %CD%\BIN\sqlite3_64.dll ) ELSE ( copy %CD%\DIST\sqlite3.dll %CD%\BIN\sqlite3_32.dll )
-    - IF "%PLATFORM%" == "x64" ( copy %CD%\DIST\PCRE\pcre.redist.8.33.0.1\build\native\bin\v100\x64\Release\dynamic\utf8\pcre8.dll %CD%\bin\pcre64.dll ) ELSE ( copy %CD%\DIST\PCRE\pcre.redist.8.33.0.1\build\native\bin\v100\Win32\Release\dynamic\utf8\pcre8.dll %CD%\bin\pcre32.dll )
-    - git clone --depth 1 https://github.com/nim-lang/csources
-    - cd csources
-    - IF "%PLATFORM%" == "x64" ( build64.bat ) else ( build.bat )
-    - cd ..
+    - 7z x -y "%MINGW_ARCHIVE%" -o"%CD%\tools_tmp"> nul
+    - IF not exist "%NIM_ARCHIVE%" appveyor DownloadFile "%NIM_URL%" -FileName "%NIM_ARCHIVE%"
+    - 7z x -y "%NIM_ARCHIVE%" -o"%CD%\tools_tmp"> nul
+    - SET PATH=%CD%\tools_tmp\%NIM_DIR%\bin;%CD%\tools_tmp\%MINGW_DIR%\bin;%PATH%
 
 build: off
 deploy: off
