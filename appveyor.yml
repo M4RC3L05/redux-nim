@@ -7,7 +7,7 @@ cache:
     - nim-0.19.0_x32.zip
 
 matrix:
-    fast_finish: false
+    fast_finish: true
 
 environment:
     matrix:
