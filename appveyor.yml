@@ -15,15 +15,15 @@ environment:
           MINGW_URL: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z/download
           MINGW_ARCHIVE: x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
           NIM_ARCHIVE: nim-0.19.0_x64.zip
-          NIM_DIR: nim-0.19.0
+          NIM_DIR: nim-0.19.0_x64
           NIM_URL: https://nim-lang.org/download/nim-0.19.0_x64.zip
           platform: x64
 
         - MINGW_DIR: mingw32
           MINGW_URL: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.9.2/threads-win32/dwarf/i686-4.9.2-release-win32-dwarf-rt_v4-rev4.7z/download
           MINGW_ARCHIVE: i686-4.9.2-release-win32-dwarf-rt_v4-rev4.7z
-          NIM_ARCHIVE: nim-0.19.0_x32zip
-          NIM_DIR: nim-0.19.0
+          NIM_ARCHIVE: nim-0.19.0_x32.zip
+          NIM_DIR: nim-0.19.0_x32
           NIM_URL: https://nim-lang.org/download/nim-0.19.0_x32.zip
           platform: x86
 
