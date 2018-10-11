@@ -3,6 +3,7 @@ language: c
 os:
     - linux
     - osx
+    - windows
 env:
     # Build and test against the master and devel branches of Nim
     - BRANCH=master
