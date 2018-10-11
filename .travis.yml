@@ -1,5 +1,5 @@
 # Copied from https://github.com/nim-lang/Nim/wiki/TravisCI
-language: c
+# language: c
 os:
     - linux
     - osx
