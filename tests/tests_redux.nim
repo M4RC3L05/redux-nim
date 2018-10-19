@@ -11,6 +11,9 @@ suite "Redux Tests":
 
 
         proc `$`(user: User): string =
+            if user == nil:
+                return "no user"
+
             return &"User: {user.name}"
 
         type
@@ -33,7 +36,7 @@ suite "Redux Tests":
                     name: ChangeUserNameProcAction(action).payload()
                 )
 
-            return if state != nil: state else: initState
+            return if state == nil: initState else: state
 
         let store = newReduxStore[User](userReducer)
 
@@ -75,13 +78,13 @@ suite "Redux Tests":
     test "it should apply middlewares":
         var tmp: string = ""
 
-        let loggerMiddleware: ReduxMiddleware[User] = proc(store: ReduxStore[User]): proc(next: proc(store: ReduxStore[User], action: ReduxAction): void): proc(action: ReduxAction): ReduxAction =
-            return proc(next: proc(store: ReduxStore[User], action: ReduxAction): void): proc(action: ReduxAction): ReduxAction =
+        let loggerMiddleware: ReduxMiddleware[User] = proc(store: ReduxStore[User]): proc(next: proc(store: ReduxStore[User], action: ReduxAction): ReduxAction): proc(action: ReduxAction): ReduxAction =
+            return proc(next: proc(store: ReduxStore[User], action: ReduxAction): ReduxAction): proc(action: ReduxAction): ReduxAction =
                 return proc(action: ReduxAction): ReduxAction =
                     tmp.add(&"Before: {store.getState()}")
-                    next(store, action)
+                    let nextAction = next(store, action)
                     tmp.add(&"After: {store.getState()}")
-                    return action
+                    return nextAction
 
 
 

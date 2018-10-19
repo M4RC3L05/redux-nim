@@ -44,5 +44,5 @@ let store = newReduxStore[AppState](rootReducer)
 
 discard store.subscribe do () -> void: echo(store.getState())
 
-store.dispatch(AddHobbieAction(payload: "Run"))
-store.dispatch(ChangeNameAction(payload: "João"))
+discard store.dispatch(AddHobbieAction(payload: "Run"))
+discard store.dispatch(ChangeNameAction(payload: "João"))

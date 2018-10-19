@@ -69,7 +69,7 @@ proc newTask() =
     let txt = stdin.readLine()
     task.text = txt
 
-    store.dispatch(AddTaskAction(payload: task))
+    discard store.dispatch(AddTaskAction(payload: task))
     echo("saved")
 
 # PROCEDURE TO PRINT THE APPLICATION MENU
@@ -94,7 +94,7 @@ proc removeTask() =
         echo("Opção invalida")
         return
 
-    store.dispatch(RemoveTaskAction(payload: store.getState().tasks[op]))
+    discard store.dispatch(RemoveTaskAction(payload: store.getState().tasks[op]))
     echo("removed")
 
 # PROCEDURE TO UPDATE AND DISPATCH A GIVEN TASK
@@ -115,7 +115,7 @@ proc updateTask() =
 
     let prevTask = store.getState().tasks[op]
 
-    store.dispatch(UpdateTaskAction(
+    discard store.dispatch(UpdateTaskAction(
         payload: (
             prevTask: prevTask,
             newTaskText: if textNewTask == "-1": prevTask.text else: textNewTask
