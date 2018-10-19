@@ -1,6 +1,6 @@
 import redux_nim/arrUtils
 import redux_nim/compose
-import sequtils, strformat, typetraits, asyncdispatch, httpclient, strutils, os
+import sequtils, strformat, typetraits
 
 type
     ReduxSubscription* = proc(): void
