@@ -24,9 +24,6 @@ type
 
     InDispatchingProcessError* = object of Exception
 
-    ReduxAsyncAction*[T] = ref object of ReduxAction
-        thunk: proc(dispatch: proc(action: ReduxAction): void): Future[void]
-
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T, middlewares: seq[ReduxMiddleware[T]]): ReduxStore[T]

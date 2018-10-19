@@ -10,11 +10,7 @@ suite "Redux Tests":
             name: string
 
 
-        proc `$`(user: User): string =
-            if user == nil:
-                return "no user"
-
-            return &"User: {user.name}"
+        proc `$`(user: User): string = &"User: {user.name}"
 
         type
             ChangeUserNameAction = ref object of ReduxAction
