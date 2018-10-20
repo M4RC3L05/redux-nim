@@ -22,22 +22,23 @@ type
 
     ReduxMiddleware*[T] = proc(store: ReduxStore[T]): proc(next: proc(store: ReduxStore[T], action: ReduxAction): ReduxAction): proc(action: ReduxAction): ReduxAction
 
-    InDispatchingProcessError* = object of Exception
+    ReduxInDispatchingProcessError* = object of Exception
+    ReduxDispatchProcessError* = object of Exception
 
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T, middlewares: seq[ReduxMiddleware[T]]): ReduxStore[T]
-proc getState*[T](store: ReduxStore[T]): T {.raises: [InDispatchingProcessError].}
+proc getState*[T](store: ReduxStore[T]): T {.raises: [ReduxInDispatchingProcessError].}
 proc subscribe*[T](store: ReduxStore[T], fn: ReduxSubscription): ReduxUnsubscription
 proc unsubscribe*[T](store: ReduxStore[T], id: int): void
 proc notify[T](store: ReduxStore[T]): void
-proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [InDispatchingProcessError].}
+proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [ReduxInDispatchingProcessError, ReduxDispatchProcessError].}
 proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): ReduxAction
 
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T] =
     ## Creates a new redux store of a given type
 
-    var localStore = ReduxStore[T](reducer: reducer, isDispatching: false, middlewares: @[])
+    var localStore = ReduxStore[T](reducer: reducer, isDispatching: false)
     discard localStore.dispatch(INITReduxAction())
     return localStore
 
@@ -56,11 +57,11 @@ proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T, middlewares: s
     discard localStore.dispatch(INITReduxAction())
     return localStore
 
-proc getState*[T](store: ReduxStore[T]): T {.raises: [InDispatchingProcessError].} =
+proc getState*[T](store: ReduxStore[T]): T {.raises: [ReduxInDispatchingProcessError].} =
     ## Returns the state of the store
 
     if store.isDispatching:
-        raise newException(InDispatchingProcessError, "You cannot get state while the dispatch is in progress!")
+        raise newException(ReduxInDispatchingProcessError, "You cannot get state while the dispatch is in progress!")
 
     return store.state
 
@@ -78,26 +79,35 @@ proc unsubscribe*[T](store: ReduxStore[T], id: int): void =
 
     store.subscriptions.delete(id)
 
-proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [InDispatchingProcessError].} =
+proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [ReduxInDispatchingProcessError, ReduxDispatchProcessError].} =
     ## Dispatches an action to the reducer, so that the reducer
     ## produces the new state
 
     if store.isDispatching:
-        raise newException(InDispatchingProcessError, "You cannot dispatch on reducers!")
+        raise newException(ReduxInDispatchingProcessError, "You cannot dispatch on reducers!")
 
-    if store.middlewares.len <= 0:
-        return store.innerDispatch(action)
-    else:
-        return compose(store.middlewares)(action)
+    try:
+        if store.middlewares.len <= 0:
+            return store.innerDispatch(action)
 
-proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [InDispatchingProcessError].} =
+        else:
+            return compose(store.middlewares)(action)
+
+    except Exception:
+        raise newException(ReduxDispatchProcessError, "An error ocurr when you try to dispatch and action")
+
+proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [ReduxInDispatchingProcessError, ReduxDispatchProcessError].} =
 
     if store.isDispatching:
-        raise newException(InDispatchingProcessError, "You cannot dispatch on reducers!")
+        raise newException(ReduxInDispatchingProcessError, "You cannot dispatch on reducers!")
 
     try:
         store.isDispatching = true
         store.state = store.reducer(state = store.state, action = action)
+
+    except Exception:
+        raise newException(ReduxDispatchProcessError, "An error ocurr when you try to dispatch and action")
+
     finally:
         store.isDispatching = false
 

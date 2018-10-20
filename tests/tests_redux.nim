@@ -100,7 +100,7 @@ suite "Redux Tests":
         discard store2.dispatch(
             ChangeUserNameProcAction(
                 payload: proc(): string =
-                    expect(InDispatchingProcessError):
+                    expect(ReduxInDispatchingProcessError):
                         discard store2.getState()
                     return "Ana"
             )
