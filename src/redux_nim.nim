@@ -3,27 +3,27 @@ import redux_nim/compose
 import sequtils, strformat, typetraits
 
 type
-    ReduxSubscription* = proc(): void
+    ReduxSubscription* = proc(): void ## The type of a redux subscription
 
-    ReduxUnsubscription* = proc(): void
+    ReduxUnsubscription* = proc(): void ## The type of a redux subscription
 
-    ReduxAction* = ref object of RootObj
+    ReduxAction* = ref object of RootObj ## The type of a redux action
 
-    ReduxReducer*[T] = proc(state: T, action: ReduxAction): T
+    ReduxReducer*[T] = proc(state: T, action: ReduxAction): T ## The type of a redux reducer
 
     INITReduxAction = ref object of ReduxAction
 
-    ReduxStore*[T] = ref object
+    ReduxStore*[T] = ref object ## The type of a redux store
         state: T
         reducer: ReduxReducer[T]
         subscriptions: seq[ReduxSubscription]
         middlewares: seq[proc(action: ReduxAction): ReduxAction]
         isDispatching: bool
 
-    ReduxMiddleware*[T] = proc(store: ReduxStore[T]): proc(next: proc(store: ReduxStore[T], action: ReduxAction): ReduxAction): proc(action: ReduxAction): ReduxAction
+    ReduxMiddleware*[T] = proc(store: ReduxStore[T]): proc(next: proc(store: ReduxStore[T], action: ReduxAction): ReduxAction): proc(action: ReduxAction): ReduxAction ## The type of a redux middleware
 
-    ReduxInDispatchingProcessError* = object of Exception
-    ReduxDispatchProcessError* = object of Exception
+    ReduxInDispatchingProcessError* = object of Exception ## The type of a redux dispatch in progress error
+    ReduxDispatchProcessError* = object of Exception ## The type of a redux dispatch error
 
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T]
 proc newReduxStore*[T](reducer: ReduxReducer[T], initialState: T): ReduxStore[T]

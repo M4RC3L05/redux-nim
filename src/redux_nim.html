@@ -1266,8 +1266,10 @@ function main() {
     title="ReduxMiddleware[T] = proc (store: ReduxStore[T]): proc (
     next: proc (store: ReduxStore[T]; action: ReduxAction): ReduxAction): proc (
     action: ReduxAction): ReduxAction"><wbr />Redux<wbr />Middleware<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#InDispatchingProcessError"
-    title="InDispatchingProcessError = object of Exception"><wbr />In<wbr />Dispatching<wbr />Process<wbr />Error<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#ReduxInDispatchingProcessError"
+    title="ReduxInDispatchingProcessError = object of Exception"><wbr />Redux<wbr />In<wbr />Dispatching<wbr />Process<wbr />Error<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#ReduxDispatchProcessError"
+    title="ReduxDispatchProcessError = object of Exception"><wbr />Redux<wbr />Dispatch<wbr />Process<wbr />Error<span class="attachedType" style="visibility:hidden"></span></a></li>
 
   </ul>
 </li>
@@ -1302,29 +1304,29 @@ function main() {
   <div class="section" id="6">
 <h1><a class="toc-backref" href="#6">Imports</a></h1>
 <dl class="item">
-<a class="reference external" href="redux_nim/arrUtils.html">redux_nim/arrUtils</a>, <a class="reference external" href="redux_nim/compose.html">redux_nim/compose</a>
+<a class="reference external" href="arrUtils.html">arrUtils</a>, <a class="reference external" href="compose.html">compose</a>
 </dl></div>
 <div class="section" id="7">
 <h1><a class="toc-backref" href="#7">Types</a></h1>
 <dl class="item">
 <dt id="ReduxSubscription"><a name="ReduxSubscription"></a><pre><a href="redux_nim.html#ReduxSubscription"><span class="Identifier">ReduxSubscription</span></a> <span class="Other">=</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">void</span></pre></dt>
 <dd>
-
+The type of a redux subscription
 
 </dd>
 <dt id="ReduxUnsubscription"><a name="ReduxUnsubscription"></a><pre><a href="redux_nim.html#ReduxUnsubscription"><span class="Identifier">ReduxUnsubscription</span></a> <span class="Other">=</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">void</span></pre></dt>
 <dd>
-
+The type of a redux subscription
 
 </dd>
 <dt id="ReduxAction"><a name="ReduxAction"></a><pre><a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a> <span class="Other">=</span> <span class="Keyword">ref</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">RootObj</span></pre></dt>
 <dd>
-
+The type of a redux action
 
 </dd>
 <dt id="ReduxReducer"><a name="ReduxReducer"></a><pre><a href="redux_nim.html#ReduxReducer"><span class="Identifier">ReduxReducer</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span> <span class="Other">=</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">state</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
 <dd>
-
+The type of a redux reducer
 
 </dd>
 <dt id="ReduxStore"><a name="ReduxStore"></a><pre><a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span> <span class="Other">=</span> <span class="Keyword">ref</span> <span class="Keyword">object</span>
@@ -1335,19 +1337,24 @@ function main() {
   <span class="Identifier">isDispatching</span><span class="Other">:</span> <span class="Identifier">bool</span>
 </pre></dt>
 <dd>
-
+The type of a redux store
 
 </dd>
 <dt id="ReduxMiddleware"><a name="ReduxMiddleware"></a><pre><a href="redux_nim.html#ReduxMiddleware"><span class="Identifier">ReduxMiddleware</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span> <span class="Other">=</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span>
     <span class="Identifier">next</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span>
     <span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a></pre></dt>
 <dd>
-
+The type of a redux middleware
 
 </dd>
-<dt id="InDispatchingProcessError"><a name="InDispatchingProcessError"></a><pre><a href="redux_nim.html#InDispatchingProcessError"><span class="Identifier">InDispatchingProcessError</span></a> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">Exception</span></pre></dt>
+<dt id="ReduxInDispatchingProcessError"><a name="ReduxInDispatchingProcessError"></a><pre><a href="redux_nim.html#ReduxInDispatchingProcessError"><span class="Identifier">ReduxInDispatchingProcessError</span></a> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">Exception</span></pre></dt>
 <dd>
+The type of a redux dispatch in progress error
 
+</dd>
+<dt id="ReduxDispatchProcessError"><a name="ReduxDispatchProcessError"></a><pre><a href="redux_nim.html#ReduxDispatchProcessError"><span class="Identifier">ReduxDispatchProcessError</span></a> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">Exception</span></pre></dt>
+<dd>
+The type of a redux dispatch error
 
 </dd>
 
@@ -1371,7 +1378,7 @@ Creates a new redux store of a given type
 Creates a new redux store of a given type
 
 </dd>
-<dt id="getState"><a name="getState,ReduxStore[T]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">getState</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><a href="redux_nim.html#InDispatchingProcessError"><span class="Identifier">InDispatchingProcessError</span></a><span class="Other">]</span></span><span class="Other">.}</span></span></pre></dt>
+<dt id="getState"><a name="getState,ReduxStore[T]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">getState</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><a href="redux_nim.html#ReduxInDispatchingProcessError"><span class="Identifier">ReduxInDispatchingProcessError</span></a><span class="Other">]</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
 Returns the state of the store
 
@@ -1386,7 +1393,8 @@ Subscribe to changes on the store, to be notified of It returns an unsubscriptio
 Unsubscribes from the store
 
 </dd>
-<dt id="dispatch"><a name="dispatch,ReduxStore[T],ReduxAction"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dispatch</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a></pre></dt>
+<dt id="dispatch"><a name="dispatch,ReduxStore[T],ReduxAction"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dispatch</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">store</span><span class="Other">:</span> <a href="redux_nim.html#ReduxStore"><span class="Identifier">ReduxStore</span></a><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a><span class="Other">)</span><span class="Other">:</span> <a href="redux_nim.html#ReduxAction"><span class="Identifier">ReduxAction</span></a> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma">
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><a href="redux_nim.html#ReduxInDispatchingProcessError"><span class="Identifier">ReduxInDispatchingProcessError</span></a><span class="Other">,</span> <a href="redux_nim.html#ReduxDispatchProcessError"><span class="Identifier">ReduxDispatchProcessError</span></a><span class="Other">]</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
 Dispatches an action to the reducer, so that the reducer produces the new state
 
@@ -1401,7 +1409,7 @@ Dispatches an action to the reducer, so that the reducer produces the new state
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2018-10-19 23:57:55 UTC</small>
+        <small>Made with Nim. Generated: 2018-10-20 11:40:46 UTC</small>
       </div>
     </div>
   </div>
