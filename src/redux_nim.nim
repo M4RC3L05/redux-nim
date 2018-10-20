@@ -31,7 +31,7 @@ proc getState*[T](store: ReduxStore[T]): T {.raises: [InDispatchingProcessError]
 proc subscribe*[T](store: ReduxStore[T], fn: ReduxSubscription): ReduxUnsubscription
 proc unsubscribe*[T](store: ReduxStore[T], id: int): void
 proc notify[T](store: ReduxStore[T]): void
-proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction
+proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [InDispatchingProcessError].}
 proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): ReduxAction
 
 proc newReduxStore*[T](reducer: ReduxReducer[T]): ReduxStore[T] =
@@ -78,7 +78,7 @@ proc unsubscribe*[T](store: ReduxStore[T], id: int): void =
 
     store.subscriptions.delete(id)
 
-proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction =
+proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [InDispatchingProcessError].} =
     ## Dispatches an action to the reducer, so that the reducer
     ## produces the new state
 
@@ -90,7 +90,7 @@ proc dispatch*[T](store: ReduxStore[T], action: ReduxAction): ReduxAction =
     else:
         return compose(store.middlewares)(action)
 
-proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): ReduxAction =
+proc innerDispatch[T](store: ReduxStore[T], action: ReduxAction): ReduxAction {.raises: [InDispatchingProcessError].} =
 
     if store.isDispatching:
         raise newException(InDispatchingProcessError, "You cannot dispatch on reducers!")
